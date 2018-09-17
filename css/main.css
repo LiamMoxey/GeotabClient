@@ -12,10 +12,11 @@ body {
     height: 250px;
     width: 250px;
     background-color: orange;
-    margin: 1px;
+    margin: 1%;
     border: 1px;
     border-color: black;
     color: black;
+    border-radius: 1%;
 }
 
 .tile:hover {

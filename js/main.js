@@ -1,19 +1,61 @@
 const server = "my.geotab.com";
 const database = "Skyjack";
-const user = "Gonzalo.Zuniga@skyjack.com";
-const password = "Tenbohourin05+";
 const deviceId = "b1";
 
 var api;
 var userId;
 
 $(document).ready(function () {
+    localStorage.clear();
+    $('#mdlLogin').modal({
+        backdrop: false,
+        keyboard: false,
+        focus: true
+    });
+    $('#mdlLogin').modal("show");
+    $("#txtUsername").focus();
+
+    $("#btnLogin").on("click", btnLoginClicked);
+    $(".tile").on("click", tileClicked);
+});
+
+function btnLoginClicked() {
+    let username = $("#txtUsername").val();
+    let password = $("#txtPassword").val();
+    let isValid = true;
+
+    $("#errUsername").html("");
+    $("#errPassword").html("");
+    if (username == null || username.trim() == "") {
+        isValid = false;
+        $("#errUsername").html("Username is required.");
+        $("#txtUsername").focus();
+    } else if (password == null || password.trim() == "") {
+        isValid = false;
+        $("#errPassword").html("Password is required.");
+        $("#txtPassword").focus();
+    }
+
+    if (isValid) {
+        login(username, password);
+    } else {
+        return;
+    }
+}
+
+function tileClicked() {
+    let message = $(this).html();
+    console.log(message);
+    sendMessage(message);
+    sendCustomData(message);
+}
+
+function login(username, password) {
     api = GeotabApi(function (authenticateCallback) {
-        authenticateCallback(server, database, user, password, function (err) {
-            console.error(err);
+        authenticateCallback(server, database, username, password, function (err) {
+            $("#errPassword").html("Username or password is incorrect.");
         });
     });
-
     api.getSession(function (credentials, server) {
         api.call("Get", {
             typeName: "User",
@@ -23,39 +65,17 @@ $(document).ready(function () {
         }, function (result) {
             if (!result || !result.length) {
                 console.log("Error: No user found with username " + credentials.userName);
+            } else {
+                userId = result[0].id;
+                $('#mdlLogin').modal("hide");
             }
-            console.log(result[0].id);
-            userId = result[0].id;
         }, function (err) {
             console.log("Error: " + err);
         });
     }, false);
-
-    api.call("Get", {
-        typeName: "Device"
-    }, function (result) {
-        if (result !== undefined && result.length) {
-            for (let i = 0; i < result.length; i++) {
-                console.log(result[i].id + " " + result[i].name);
-            }
-        } else {
-            console.log("Error: No devices found.");
-        }
-    }, function (err) {
-        console.log("Error: " + err);
-    });
-
-    $(".tile").on("click", tileClicked);
-});
-
-function tileClicked() {
-    let message = $(this).html();
-    console.log(message);
-    //sendMessage(message);
-    sendCustomData(message);
 }
 
-function sendMessage(message) {
+function sendTextMessage(message) {
     api.call("Add", {
         typeName: "TextMessage",
         entity: {
@@ -93,15 +113,4 @@ function sendCustomData(message) {
     }, function (err) {
         console.log("Error: " + err);
     });
-}
-
-function convertMessageToBinary(message) {
-    let output = [];
-    for (let i = 0; i < message.length; i++) {
-        let bin = message[i].charCodeAt().toString(2);
-        output.push(Array(8 - bin.length + 1).join("0") + bin);
-    }
-    console.log(output);
-    console.log(output.join(""));
-    return output.join("");
 }

@@ -31,6 +31,8 @@
         <![endif]-->
 
     <div class="container">
+        <h1 class="display-1 text-center">Geotab Message Tester</h1>
+
         <div class="d-flex justify-content-center">
             <div class="tile d-flex justify-content-center align-items-center">Forward</div>
             <div class="tile d-flex justify-content-center align-items-center">Lift</div>
@@ -46,5 +48,32 @@
         </div>
     </div>
 </body>
+
+<div class="modal fade" id="mdlLogin" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Please login with your Geotab account.</h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="txtUsername" class="col-form-label">Username:</label>
+                        <input type="text" class="form-control" id="txtUsername">
+                        <span class="text-danger" id="errUsername"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtPassword" class="col-form-label">Password:</label>
+                        <input type="password" class="form-control" id="txtPassword" />
+                        <span class="text-danger" id="errPassword"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnLogin">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </html>
