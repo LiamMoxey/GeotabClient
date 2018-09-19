@@ -49,8 +49,6 @@ function btnLoginClicked() {
 
     if (isValid) {
         login(username, password);
-    } else {
-        return;
     }
 }
 
@@ -91,6 +89,7 @@ function login(username, password) {
         });
     }, false);
 }
+
 /*
  * Adds TextMessage object to Geotab database
  */
