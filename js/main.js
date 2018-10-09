@@ -1,13 +1,16 @@
 /*
  * Definition of constants such as Geotab server and database,
  * and global variables such as api to make api calls and 
- * userId to send your id in the calls
+ * userId to send your id in the calls. Also interval and its rate
+ * to make Geotab API calls at a specific rate
  */
 const server = "my.geotab.com";
 const database = "Skyjack";
 const deviceId = "b1";
+const rate = 1500;
 var api;
 var userId;
+var interval;
 
 /*
  * Executes as soon as page loads to show login prompt and set up events
@@ -23,7 +26,8 @@ $(document).ready(function () {
     $("#txtUsername").focus();
 
     $("#btnLogin").on("click", btnLoginClicked);
-    $(".tile").on("click", tileClicked);
+    console.log(interval);
+    $(".tile").on("mousedown", tileBeingClicked).on("mouseup mouseleave", tileNotBeingClicked);
 });
 
 /*
@@ -53,12 +57,21 @@ function btnLoginClicked() {
 }
 
 /*
- * Identifies which tile was clicked and executes function to adding 
- * TextMessage on Geotab database
+ * Identifies which tile is being clicked and executes function to adding 
+ * TextMessage on Geotab database at a specific rate
  */
-function tileClicked() {
+function tileBeingClicked() {
     let message = $(this).html();
-    sendTextMessage(message);
+    interval = setInterval(function () {
+        sendTextMessage(message);
+    }, rate);
+}
+
+/*
+ * Clears the interval when no tile is being clicked anymore 
+ */
+function tileNotBeingClicked() {
+    clearInterval(interval);
 }
 
 /*
