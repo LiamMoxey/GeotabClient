@@ -26,8 +26,7 @@ $(document).ready(function () {
     $("#txtUsername").focus();
 
     $("#btnLogin").on("click", btnLoginClicked);
-    console.log(interval);
-    $(".tile").on("mousedown", tileBeingClicked).on("mouseup mouseleave", tileNotBeingClicked);
+    $(".tile").on("mousedown touchstart", tileBeingClicked).on("mouseup touchend mouseleave touchleave", tileNotBeingClicked);
 });
 
 /*
@@ -60,7 +59,8 @@ function btnLoginClicked() {
  * Identifies which tile is being clicked and executes function to adding 
  * TextMessage on Geotab database at a specific rate
  */
-function tileBeingClicked() {
+function tileBeingClicked(e) {
+    e.preventDefault();
     let message = $(this).html();
     interval = setInterval(function () {
         sendTextMessage(message);
@@ -70,7 +70,8 @@ function tileBeingClicked() {
 /*
  * Clears the interval when no tile is being clicked anymore 
  */
-function tileNotBeingClicked() {
+function tileNotBeingClicked(e) {
+    e.preventDefault();
     clearInterval(interval);
 }
 
