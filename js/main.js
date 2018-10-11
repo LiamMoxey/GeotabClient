@@ -8,6 +8,7 @@ const server = "my.geotab.com";
 const database = "Skyjack";
 const deviceId = "b1";
 const rate = 1500;
+const messageID = 2457; // 2457 = 0x00000999
 var api;
 var userId;
 var interval;
@@ -62,8 +63,31 @@ function btnLoginClicked() {
 function tileBeingClicked(e) {
     e.preventDefault();
     let message = $(this).html();
+	switch(message) {
+		case "Forward":
+			message = "FoAAAAAAAAA="; // 0x 16 80 00 00 00 00 00 00
+			break;
+		case "Reverse":
+			message = "koAAAAAAAAA="; // 0x 92 80 00 00 00 00 00 00
+			break;
+		case "Left":
+			message = "E4AAAAAAAAA="; // 0x 13 80 00 00 00 00 00 00
+			break;
+		case "Right":
+			message = "MoAAAAAAAAA="; // 0x 32 80 00 00 00 00 00 00
+			break;
+		case "Lift":
+			message = "RoAAAAAAAAA="; // 0x 46 80 00 00 00 00 00 00
+			break;
+		case "Lower":
+			message = "woAAAAAAAAA="; // 0x C2 80 00 00 00 00 00 00
+			break;
+		case "Stop":
+			message = "AAAAAAAAAAA="; // 0x 00 00 00 00 00 00 00 00
+			break;
+	}
     interval = setInterval(function () {
-        sendTextMessage(message);
+        sendTextMessage(message, messageID);
     }, rate);
 }
 
@@ -107,17 +131,23 @@ function login(username, password) {
 /*
  * Adds TextMessage object to Geotab database
  */
-function sendTextMessage(message) {
+function sendTextMessage(message, ID) {
     api.call("Add", {
         typeName: "TextMessage",
         entity: {
             isDirectionToVehicle: true,
+			activeFrom: "1986-01-01T00:00:00.000Z",
+			activeTo: "2050-01-01T00:00:00.000Z",
             device: {
                 id: deviceId
             },
             messageContent: {
-                contentType: "Normal",
-                message: message
+                contentType: 12,
+				channel: 1,
+				arbitrationId: ID,
+				isAcknowledgeRequired: true,
+				extendedFrameFlag: true,
+                data: message
             },
             user: {
                 id: userId
