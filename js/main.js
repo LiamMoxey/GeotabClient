@@ -9,6 +9,7 @@ const database = "Skyjack";
 const deviceId = "b1";
 const rate = 1500;
 const messageID = 2457; // 2457 = 0x00000999
+var selfCheckActive = false;
 var api;
 var userId;
 var interval;
@@ -63,32 +64,64 @@ function btnLoginClicked() {
 function tileBeingClicked(e) {
     e.preventDefault();
     let message = $(this).html();
-	switch(message) {
-		case "Forward":
-			message = "FoAAAAAAAAA="; // 0x 16 80 00 00 00 00 00 00
-			break;
-		case "Reverse":
-			message = "koAAAAAAAAA="; // 0x 92 80 00 00 00 00 00 00
-			break;
-		case "Left":
-			message = "E4AAAAAAAAA="; // 0x 13 80 00 00 00 00 00 00
-			break;
-		case "Right":
-			message = "MoAAAAAAAAA="; // 0x 32 80 00 00 00 00 00 00
-			break;
-		case "Lift":
-			message = "RoAAAAAAAAA="; // 0x 46 80 00 00 00 00 00 00
-			break;
-		case "Lower":
-			message = "woAAAAAAAAA="; // 0x C2 80 00 00 00 00 00 00
-			break;
-		case "Stop":
-			message = "AAAAAAAAAAA="; // 0x 00 00 00 00 00 00 00 00
-			break;
+	if (0) { // This toggle is to prevent accidental triggering of machine funcitons by unintended user; Gonzalo, you should never change this to 1
+		switch(message) {
+			case "Forward":
+				message = "FoAAAAAAAAA="; // 0x 16 80 00 00 00 00 00 00
+				break;
+			case "Reverse":
+				message = "koAAAAAAAAA="; // 0x 92 80 00 00 00 00 00 00
+				break;
+			case "Left":
+				message = "E4AAAAAAAAA="; // 0x 13 80 00 00 00 00 00 00
+				break;
+			case "Right":
+				message = "MoAAAAAAAAA="; // 0x 32 80 00 00 00 00 00 00
+				break;
+			case "Lift":
+				message = "RoAAAAAAAAA="; // 0x 46 80 00 00 00 00 00 00
+				break;
+			case "Lower":
+				message = "woAAAAAAAAA="; // 0x C2 80 00 00 00 00 00 00
+				break;
+			case "Self-check":
+				if (!selfCheckActive) {
+					selfCheck();
+				}
+				break;
+		}
 	}
-    interval = setInterval(function () {
-        sendTextMessage(message, messageID);
-    }, rate);
+	if (message != "Self-check") {	
+		interval = setInterval(function () {
+			sendTextMessage(message, messageID);
+		}, rate);
+	}
+}
+
+function selfCheck() { // Runs through all machine functions, setTimeout used to ensure messages arrive in correct order
+	selfCheckActive = true;
+	var interval = 100;
+
+	sendTextMessage("FoAAAAAAAAA=", messageID); 					// Drive forward
+	setTimeout(function() {sendTextMessage("AAAAAAAAAAA=", messageID);}, interval*2);	// Stop
+	
+	setTimeout(function() {sendTextMessage("koAAAAAAAAA=", messageID);}, interval*3);	// Drive backward
+	setTimeout(function() {sendTextMessage("AAAAAAAAAAA=", messageID);}, interval*4);	// Stop
+	
+	setTimeout(function() {sendTextMessage("E4AAAAAAAAA=", messageID);}, interval*5);	// Turn left
+	setTimeout(function() {sendTextMessage("AAAAAAAAAAA=", messageID);}, interval*6);	// Stop
+	
+	setTimeout(function() {sendTextMessage("MoAAAAAAAAA=", messageID);}, interval*7);	// Turn right
+	setTimeout(function() {sendTextMessage("AAAAAAAAAAA=", messageID);}, interval*8);	// Stop
+	
+	setTimeout(function() {sendTextMessage("RoAAAAAAAAA=", messageID);}, interval*9);	// Raise
+	setTimeout(function() {sendTextMessage("AAAAAAAAAAA=", messageID);}, interval*10);	// Stop
+	
+	setTimeout(function() {sendTextMessage("woAAAAAAAAA=", messageID);}, interval*11);	// Lower
+	setTimeout(function() {sendTextMessage("woAAAAAAAAA=", messageID);}, interval*12);	// Lower again
+	setTimeout(function() {sendTextMessage("woAAAAAAAAA=", messageID);}, interval*13);	// Lower again
+	
+	setTimeout(function() {selfCheckActive = false;}, interval*14);	// Disable flag
 }
 
 /*
